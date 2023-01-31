@@ -13,7 +13,7 @@ export class Modal extends Component {
 
   onEscPressClose = event => {
     if (event.code === 'Escape') {
-      this.props.closeModal()()
+      this.props.closeModal();
     };
   };
 
