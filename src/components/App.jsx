@@ -10,16 +10,13 @@ import css from './App.module.css';
 export class App extends Component {
   state = {
     page: 1,
+    totalHits: '1',
     query: '',
     images: [],
     loader: false,
     selectedImageData: {},
     showModal: false,
   };
-
-  componentDidMount() {
-    window.addEventListener('keydown', this.onEscPressClose);
-  }
 
   async componentDidUpdate(_, prevState) {
     if (prevState.query !== this.state.query || prevState.page !== this.state.page) {
@@ -28,22 +25,19 @@ export class App extends Component {
       try {
         const data = await apiData(this.state.query, this.state.page);
         if (prevState.query !== this.state.query) {
-          this.setState({ images: [...data.hits] });
+          this.setState({ images: [...data.hits], totalHits: data.totalHits });
         }
 
         if (prevState.page !== this.state.page && this.state.images.length > 0) {
           this.setState({ images: [...prevState.images, ...data.hits] });
         }
+
       } catch (error) {
         return alert(`Something went wrong. ${error}.`);
       } finally {
         this.showLoader(false);
       }
     }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.onEscPressClose);
   }
 
   handleFormSubmit = inputValue => {
@@ -69,12 +63,6 @@ export class App extends Component {
     this.toggleModal()
   };
 
-  onEscPressClose = (event) => {
-    if (this.state.showModal && event.code === 'Escape') {
-      this.toggleModal()
-    };
-  };
-
   toggleModal = () => {
     this.setState(state => ({ showModal: !state.showModal, }));
   };
@@ -89,13 +77,16 @@ export class App extends Component {
         {this.state.images.length !== 0 && this.state.images.length >= 12 && (
           <Button handleClick={this.loadMore} />
         )}
+         {this.state.totalHits === 0 && (
+          <h2 className={css.noMatchMsg}>Ooops... Nothing found, try something else.</h2>
+        )}
         <Loader
           height={150}
           width={150}
           color="#5876c6"
           active={this.state.loader}
         />
-        {this.state.showModal && (<Modal selectedImageData={this.state.selectedImageData} closeModal={this.toggleModal} />)}
+        {this.state.showModal && (<Modal largeImageURL={this.state.selectedImageData.largeImageURL} tags={this.state.selectedImageData.tags} closeModal={this.toggleModal} />)}
       </div>
     );
   }

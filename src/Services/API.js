@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-
 export async function apiData(query, page) {
   try {
     const result = await fetch(
@@ -10,8 +8,3 @@ export async function apiData(query, page) {
     console.error(error);
   }
 }
-
-apiData.propTypes = {
-  query: PropTypes.string.isRequired,
-  page: PropTypes.number.isRequired,
-};
